@@ -1,0 +1,76 @@
+{
+  "common": {
+    "confirm": "Übernehmen",
+    "cancel": "Abbrechen"
+  },
+  "editor": {
+    "title": "DualForge Editor",
+    "placeholder": "Inhalt hier eingeben..."
+  },
+  "status": {
+    "words": "Wörter",
+    "chars": "Zeichen",
+    "saved": "Gespeichert"
+  },
+  "toolbar": {
+    "search": "Suchen...",
+    "replace": "Ersetzen...",
+    "markdown": {
+      "label": "MARKDOWN:",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "strike": "Durchgestrichen",
+      "h1": "Überschrift 1",
+      "h2": "Überschrift 2",
+      "h3": "Überschrift 3",
+      "link": "Link einfügen",
+      "image": "Bild einfügen",
+      "code": "Inline Code",
+      "more": "Mehr Optionen",
+      "emoji": "Emoji Galerie",
+      "list": "Aufzählung",
+      "ordered": "Nummerierte Liste",
+      "table": "Tabelle",
+      "quote": "Zitat",
+      "hr": "Trennlinie",
+      "tasklist": "Aufgabenliste",
+      "footnote": "Fußnote",
+      "mermaid": "Mermaid Diagramm",
+      "math": "Mathematische Formel",
+      "admonition": "Hinweis-Box",
+      "toc": "Inhaltsverzeichnis"
+    },
+    "html": {
+      "label": "HTML:",
+      "left": "Linksbündig",
+      "center": "Zentriert",
+      "right": "Rechtsbündig",
+      "color": "Textfarbe",
+      "mark": "Markieren",
+      "small": "Klein",
+      "large": "Groß",
+      "underline": "Unterstrichen",
+      "sup": "Hochgestellt",
+      "sub": "Tiefgestellt",
+      "spoiler": "Spoiler",
+      "br": "Zeilenumbruch",
+      "picker": "Attribut-Picker",
+      "kbd": "Tastatur-Input",
+      "flex": "Flexbox Layout",
+      "grid": "Grid Layout",
+      "progress": "Fortschrittsbalken",
+      "iframe": "Video / Karte",
+      "search": "Suchen & Ersetzen",
+      "cleanup": "Code bereinigen",
+      "icon": "Icon Galerie"
+    }
+  },
+  "modal": {
+    "emoji": "Emoji Galerie",
+    "icon": "Icon Galerie",
+    "iframe_title": "Iframe Generator (YouTube / Maps)",
+    "width": "Breite (px)",
+    "height": "Höhe (px)",
+    "url": "URL einfügen..."
+  }
+}
