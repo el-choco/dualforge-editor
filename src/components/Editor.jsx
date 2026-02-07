@@ -8,6 +8,7 @@ import ColorPicker from './Modal/ColorPicker.jsx';
 import EmojiPicker from './Modal/EmojiPicker.jsx';
 import IconPicker from './Modal/IconPicker.jsx';
 import IframeGenerator from './Modal/IframeGenerator.jsx';
+import InsertModal from './Modal/InsertModal.jsx';
 import SearchReplace from './SearchReplace.jsx';
 import { cleanHTML } from '../utils/formatter.js';
 
@@ -21,43 +22,118 @@ const Editor = () => {
   
   const textAreaRef = useRef(null);
   const previewRef = useRef(null);
+  const isScrolling = useRef(false);
+
+  const processExtensions = (text) => {
+    let processed = text;
+
+    if (processed.includes('[[toc]]')) {
+      const toc = [];
+      const renderer = new marked.Renderer();
+      
+      renderer.heading = (text, level) => {
+        toc.push({ text, level });
+        return ''; 
+      };
+
+      marked.parse(processed, { renderer });
+      
+      let tocHtml = '<div class="toc-container"><strong>Inhalt</strong><ul>';
+      toc.forEach(h => {
+        tocHtml += `<li style="margin-left: ${(h.level - 1) * 20}px"><a href="#${h.text.toLowerCase().replace(/[^\w]+/g, '-')}">${h.text}</a></li>`;
+      });
+      tocHtml += '</ul></div>';
+      
+      processed = processed.replace(/\[\[toc\]\]/g, tocHtml);
+    }
+
+    processed = processed.replace(
+      /^:::(tip|info|warning|danger)\s*\n([\s\S]*?)\n:::/gm,
+      (match, type, innerContent) => {
+        const title = type.toUpperCase();
+        return `<div class="admonition ${type}"><div class="admonition-title">${title}</div>\n\n${innerContent}\n\n</div>`;
+      }
+    );
+
+    processed = processed.replace(
+      /\$\$([\s\S]*?)\$\$/gm,
+      '<div class="math-block">$$$1$$</div>'
+    );
+
+    return processed;
+  };
 
   useEffect(() => {
     localStorage.setItem('dualforge_content', content);
     
-    const rawHtml = marked.parse(content, { breaks: true, gfm: true });
+    const extendedContent = processExtensions(content);
+
+    const rawHtml = marked.parse(extendedContent, { breaks: true, gfm: true });
     
     const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
-      ADD_TAGS: ['iframe', 'i'], 
-      ADD_ATTR: ['allowfullscreen', 'frameborder', 'target', 'class', 'style'] 
+      ADD_TAGS: ['iframe', 'i', 'div', 'span'], 
+      ADD_ATTR: ['allowfullscreen', 'frameborder', 'target', 'class', 'style', 'id'] 
     });
     
     setPreviewHtml(sanitizedHtml);
   }, [content]);
 
-  const handleScroll = (e) => {
+  useEffect(() => {
+    if (window.hljs) {
+      window.hljs.highlightAll();
+    }
+    if (window.renderMathInElement && previewRef.current) {
+      window.renderMathInElement(previewRef.current, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
+    }
+  }, [previewHtml]);
+
+  const handleScroll = (source) => {
+    if (isScrolling.current) return;
+    isScrolling.current = true;
+
     const editor = textAreaRef.current;
     const preview = previewRef.current;
-    if (editor && preview) {
+
+    if (source === 'editor' && editor && preview) {
       const percentage = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
       preview.scrollTop = percentage * (preview.scrollHeight - preview.clientHeight);
+    } else if (source === 'preview' && editor && preview) {
+      const percentage = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
+      editor.scrollTop = percentage * (editor.scrollHeight - editor.clientHeight);
     }
+
+    setTimeout(() => { isScrolling.current = false; }, 50);
   };
 
   const handleInsert = (before, after = '') => {
     const el = textAreaRef.current;
     if (!el) return;
+    
     const start = el.selectionStart;
     const end = el.selectionEnd;
+    const scrollTop = el.scrollTop;
+    
     const selectedText = el.value.substring(start, end);
     const newText = el.value.substring(0, start) + before + selectedText + after + el.value.substring(end);
+    
     setContent(newText);
     setActiveModal(null);
+    
     setTimeout(() => {
       el.focus();
       const pos = start + before.length + selectedText.length + after.length;
       el.setSelectionRange(pos, pos);
+      el.scrollTop = scrollTop;
     }, 0);
+  };
+
+  const handleCleanUp = () => {
+    setContent(cleanHTML(content));
   };
 
   const stats = {
@@ -75,8 +151,10 @@ const Editor = () => {
           onOpenEmoji={() => setActiveModal('emoji')}
           onOpenIcon={() => setActiveModal('icon')}
           onOpenIframe={() => setActiveModal('iframe')}
+          onOpenLink={() => setActiveModal('link')}
+          onOpenImage={() => setActiveModal('image')}
           onToggleSearch={() => setShowSearch(!showSearch)}
-          onCleanUp={() => setContent(cleanHTML(content))}
+          onCleanUp={handleCleanUp}
           toggleReadMode={() => setReadMode(true)}
         />
       )}
@@ -98,7 +176,7 @@ const Editor = () => {
       <div className="editor-split-screen">
         <textarea
           ref={textAreaRef}
-          onScroll={handleScroll}
+          onScroll={() => handleScroll('editor')}
           className="editor-input"
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -106,6 +184,7 @@ const Editor = () => {
         />
         <div 
           ref={previewRef}
+          onScroll={() => handleScroll('preview')}
           className="editor-preview markdown-body"
           dangerouslySetInnerHTML={{ __html: previewHtml }}
         />
@@ -122,6 +201,7 @@ const Editor = () => {
       <EmojiPicker isOpen={activeModal === 'emoji'} onClose={() => setActiveModal(null)} onSelect={(e) => handleInsert(e, '')} />
       <IconPicker isOpen={activeModal === 'icon'} onClose={() => setActiveModal(null)} onSelect={(i) => handleInsert(i, '')} />
       <IframeGenerator isOpen={activeModal === 'iframe'} onClose={() => setActiveModal(null)} onConfirm={(code) => handleInsert(code)} />
+      <InsertModal isOpen={activeModal === 'link' || activeModal === 'image'} type={activeModal} onClose={() => setActiveModal(null)} onConfirm={(code) => handleInsert(code)} />
     </div>
   );
 };

@@ -1,11 +1,16 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const LanguageDropdown = ({ onSelect }) => {
-  const languages = ['javascript', 'html', 'css', 'php', 'python', 'sql', 'mermaid'];
+  const { t } = useTranslation();
+  const languages = ['javascript', 'html', 'css', 'php', 'python', 'java', 'sql', 'bash', 'json', 'mermaid'];
 
   return (
-    <select className="ui-select" onChange={(e) => onSelect(`\`\`\`${e.target.value}\n`, '\n\`\`\`')}>
-      <option value="">Code Lang</option>
+    <select className="ui-select" onChange={(e) => {
+      if(e.target.value) onSelect(`\`\`\`${e.target.value}\n`, '\n\`\`\`');
+      e.target.value = "";
+    }}>
+      <option value="">{t('toolbar.markdown.code')}</option>
       {languages.map((lang) => (
         <option key={lang} value={lang}>
           {lang.toUpperCase()}

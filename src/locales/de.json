@@ -4,7 +4,7 @@
     "cancel": "Abbrechen"
   },
   "editor": {
-    "title": "DualForge Editor",
+    "title": "DualForge Editor by el-choco",
     "placeholder": "Inhalt hier eingeben..."
   },
   "status": {
@@ -61,16 +61,19 @@
       "progress": "Fortschrittsbalken",
       "iframe": "Video / Karte",
       "search": "Suchen & Ersetzen",
-      "cleanup": "Code bereinigen",
+      "cleanup": "Formatieren",
       "icon": "Icon Galerie"
     }
   },
   "modal": {
     "emoji": "Emoji Galerie",
     "icon": "Icon Galerie",
-    "iframe_title": "Iframe Generator (YouTube / Maps)",
-    "width": "Breite (px)",
-    "height": "Höhe (px)",
-    "url": "URL einfügen..."
+    "iframe_title": "Iframe Generator",
+    "link_title": "Link einfügen",
+    "image_title": "Bild einfügen",
+    "text": "Anzeigetext / Alt-Text",
+    "url": "Ziel-URL",
+    "width": "Breite",
+    "height": "Höhe"
   }
 }
