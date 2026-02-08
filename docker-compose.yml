@@ -1,12 +1,12 @@
-version: '3.8'
-
 services:
   dualforge-editor:
     build: .
     ports:
-      - "1001:1001"
+      - "${VITE_PORT:-1001}:${VITE_PORT:-1001}"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
+    env_file:
+      - .env

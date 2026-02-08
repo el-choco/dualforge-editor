@@ -8,6 +8,7 @@ import ColorPicker from './Modal/ColorPicker.jsx';
 import EmojiPicker from './Modal/EmojiPicker.jsx';
 import IconPicker from './Modal/IconPicker.jsx';
 import IframeGenerator from './Modal/IframeGenerator.jsx';
+import TableGenerator from './Modal/TableGenerator.jsx';
 import InsertModal from './Modal/InsertModal.jsx';
 import SearchReplace from './SearchReplace.jsx';
 import { cleanHTML } from '../utils/formatter.js';
@@ -28,19 +29,14 @@ const Editor = () => {
     let processed = text;
 
     if (processed.includes('[[toc]]')) {
-      const toc = [];
-      const renderer = new marked.Renderer();
-      
-      renderer.heading = (text, level) => {
-        toc.push({ text, level });
-        return ''; 
-      };
-
-      marked.parse(processed, { renderer });
+      const tokens = marked.lexer(processed);
+      const toc = tokens.filter(token => token.type === 'heading');
       
       let tocHtml = '<div class="toc-container"><strong>Inhalt</strong><ul>';
       toc.forEach(h => {
-        tocHtml += `<li style="margin-left: ${(h.level - 1) * 20}px"><a href="#${h.text.toLowerCase().replace(/[^\w]+/g, '-')}">${h.text}</a></li>`;
+        const text = h.text;
+        const level = h.depth;
+        tocHtml += `<li style="margin-left: ${(level - 1) * 20}px"><a href="#${text.toLowerCase().replace(/[^\w]+/g, '-')}">${text}</a></li>`;
       });
       tocHtml += '</ul></div>';
       
@@ -153,6 +149,7 @@ const Editor = () => {
           onOpenIframe={() => setActiveModal('iframe')}
           onOpenLink={() => setActiveModal('link')}
           onOpenImage={() => setActiveModal('image')}
+          onOpenTable={() => setActiveModal('table')}
           onToggleSearch={() => setShowSearch(!showSearch)}
           onCleanUp={handleCleanUp}
           toggleReadMode={() => setReadMode(true)}
@@ -202,6 +199,7 @@ const Editor = () => {
       <IconPicker isOpen={activeModal === 'icon'} onClose={() => setActiveModal(null)} onSelect={(i) => handleInsert(i, '')} />
       <IframeGenerator isOpen={activeModal === 'iframe'} onClose={() => setActiveModal(null)} onConfirm={(code) => handleInsert(code)} />
       <InsertModal isOpen={activeModal === 'link' || activeModal === 'image'} type={activeModal} onClose={() => setActiveModal(null)} onConfirm={(code) => handleInsert(code)} />
+      <TableGenerator isOpen={activeModal === 'table'} onClose={() => setActiveModal(null)} onConfirm={(md) => handleInsert(md)} />
     </div>
   );
 };

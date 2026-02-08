@@ -1,18 +1,21 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    port: 1001,
-    strictPort: true,
-    hmr: {
-      clientPort: 1001,
-      host: '37.201.48.209' 
-    },
-    watch: {
-      usePolling: true
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
+    plugins: [react()],
+    server: {
+      host: env.VITE_HOST || '0.0.0.0',
+      port: parseInt(env.VITE_PORT) || 1001,
+      strictPort: true,
+      hmr: {
+        clientPort: parseInt(env.VITE_PORT) || 1001
+      },
+      watch: {
+        usePolling: true
+      }
     }
-  }
+  };
 });

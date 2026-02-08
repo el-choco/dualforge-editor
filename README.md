@@ -42,27 +42,49 @@
     * **TOC:** Auto-generated Table of Contents (`[[toc]]`).
 * **🌍 Internationalization (i18n):** One-click switch between **English** and **German**.
 * **🧹 Smart Formatter:** Cleans up code, removes trailing spaces, and fixes HTML indentation.
+* **▦ Smart Table Generator:** Visual grid editor with intelligent Excel copy-paste support to create complex Markdown tables in seconds.
 
-### 🚀 Installation & Setup
+### 🚀 Installation & Configuration
+
+**Default Port:** `1001`
+
+#### ⚙️ Configuration
+Settings are managed centrally via the `.env` file in the root directory.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/dualforge-editor.git](https://github.com/your-username/dualforge-editor.git)
+    git clone https://github.com/el-choco/dualforge-editor.git
     cd dualforge-editor
     ```
 
-2.  **Install dependencies:**
+2.  **Create or edit the `.env` file:**
+    ```env
+    VITE_PORT=1001
+    VITE_HOST=0.0.0.0
+    NODE_ENV=development
+    ```
+
+3.  **Start Container:**
+    ```bash
+    docker compose up -d
+    ```
+
+.  **Open in Browser:**
+    Go to `http://localhost:1001` (or your configured `VITE_PORT`).
+
+    > **Note:** To change the port, simply update `VITE_PORT` in the `.env` file and restart the container.
+
+#### 💻 Option B: Node.js (Manual)
+
+1.  **Install dependencies:**
     ```bash
     npm install
     ```
 
-3.  **Start the development server:**
+2.  **Start Server:**
     ```bash
     npm run dev
     ```
-
-4.  **Open in Browser:**
-    Go to `http://localhost:5173`
 
 ### 💡 Syntax Guide
 
@@ -108,27 +130,50 @@
     * **TOC:** Automatisch generiertes Inhaltsverzeichnis (`[[toc]]`).
 * **🌍 Mehrsprachigkeit (i18n):** Umschalten zwischen **Deutsch** und **Englisch** mit einem Klick.
 * **🧹 Smart Formatter:** Bereinigt den Code, entfernt unnötige Leerzeichen und repariert Abstände.
+* **▦ Smarter Tabellen-Generator:** Visueller Grid-Editor mit intelligenter Excel-Copy-Paste-Funktion zum blitzschnellen Erstellen komplexer Markdown-Tabellen.
 
-### 🚀 Installation & Einrichtung
+### 🚀 Installation & Konfiguration
+
+**Standard-Port:** `1001`
+
+#### ⚙️ Konfiguration
+Alle Einstellungen werden zentral über die `.env` Datei im Hauptverzeichnis verwaltet.
 
 1.  **Repository klonen:**
     ```bash
-    git clone [https://github.com/dein-username/dualforge-editor.git](https://github.com/dein-username/dualforge-editor.git)
+    git clone https://github.com/el-choco/dualforge-editor.git
     cd dualforge-editor
     ```
 
-2.  **Abhängigkeiten installieren:**
+2.  **Erstelle oder bearbeite die `.env` Datei:**
+    ```env
+    VITE_PORT=1001
+    VITE_HOST=0.0.0.0
+    NODE_ENV=development
+    ```
+
+3.  **Container starten:**
+    ```bash
+    docker compose up -d
+    ```
+
+4.  **Im Browser öffnen:**
+    Gehe zu `http://localhost:1001` (bzw. dein konfigurierter `VITE_PORT`).
+
+    > **Hinweis:** Um den Port zu ändern, passe einfach `VITE_PORT` in der `.env` Datei an und starte den Container neu.
+
+
+#### 💻 Option B: Node.js (Manuell)
+
+1.  **Abhängigkeiten installieren:**
     ```bash
     npm install
     ```
 
-3.  **Entwicklungsserver starten:**
+2.  **Server starten:**
     ```bash
     npm run dev
     ```
-
-4.  **Im Browser öffnen:**
-    Gehe zu `http://localhost:5173`
 
 ### 💡 Syntax Kurzanleitung
 
@@ -150,4 +195,4 @@
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by el-choco

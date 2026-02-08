@@ -16,6 +16,7 @@ import LanguageDropdown from './LanguageDropdown.jsx';
 const Toolbar = ({ 
   onInsert, onOpenPicker, onOpenColor, onOpenEmoji, 
   onOpenIcon, onOpenIframe, onOpenLink, onOpenImage, 
+  onOpenTable,
   onToggleSearch, onCleanUp 
 }) => {
   const { t, i18n } = useTranslation();
@@ -68,7 +69,7 @@ const Toolbar = ({
         <div className="ui-group">
           <button className="ui-btn" onClick={() => onInsert('- ')} title={t('toolbar.markdown.list')}><List size={18} /></button>
           <button className="ui-btn" onClick={() => onInsert('1. ')} title={t('toolbar.markdown.ordered')}><ListOrdered size={18} /></button>
-          <button className="ui-btn" onClick={() => onInsert('|  |  |\n|---|---|\n|  |  |')} title={t('toolbar.markdown.table')}><Table size={18} /></button>
+          <button className="ui-btn" onClick={onOpenTable} title={t('toolbar.markdown.table')}><Table size={18} /></button>
           <button className="ui-btn" onClick={() => onInsert('> ')} title={t('toolbar.markdown.quote')}><MessageSquare size={18} /></button>
           <button className="ui-btn" onClick={() => onInsert('---\n')} title={t('toolbar.markdown.hr')}><Minus size={18} /></button>
         </div>
