@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Trash2, Grid3X3 } from 'lucide-react';
+import { X, Grid3X3, Clipboard } from 'lucide-react';
 
 const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
   const { t } = useTranslation();
@@ -23,19 +23,16 @@ const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
     setData(newData);
   };
 
-  const handlePaste = (e, r, c) => {
-    e.preventDefault();
-    const pasteData = e.clipboardData.getData('text');
-    const rowsData = pasteData.split(/\r\n|\n|\r/).filter(row => row.trim() !== '');
-    
+  const processPasteData = (text) => {
+    const rowsData = text.split(/\r\n|\n|\r/).filter(row => row.trim() !== '');
     if (rowsData.length === 0) return;
 
-    let newRows = Math.max(rows, r + rowsData.length);
+    let newRows = Math.max(rows, rowsData.length);
     let newCols = cols;
 
     rowsData.forEach(row => {
-      const cells = row.split(/\t/); 
-      newCols = Math.max(newCols, c + cells.length);
+      const cells = row.split(/\t/);
+      newCols = Math.max(newCols, cells.length);
     });
 
     setRows(newRows);
@@ -52,14 +49,34 @@ const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
         rowsData.forEach((rowStr, i) => {
           const cellValues = rowStr.split(/\t/);
           cellValues.forEach((val, j) => {
-            if (newData[r + i] && newData[r + i][c + j] !== undefined) {
-              newData[r + i][c + j] = val.trim();
+            if (newData[i] && newData[i][j] !== undefined) {
+              newData[i][j] = val.trim();
             }
           });
         });
         return newData;
       });
     }, 50);
+  };
+
+  const handleSmartPaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      processPasteData(text);
+    } catch (err) {
+      console.error('Failed to read clipboard', err);
+    }
+  };
+
+  const handlePasteEvent = (e, r, c) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text');
+    
+    if (r === 0 && c === 0) {
+        processPasteData(pasteData);
+    } else {
+         processPasteData(pasteData); 
+    }
   };
 
   const generateMarkdown = () => {
@@ -81,30 +98,44 @@ const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: '800px', width: '90%' }} onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" style={{ maxWidth: '900px', width: '95%' }} onClick={(e) => e.stopPropagation()}>
         
         <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
           <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Grid3X3 size={20}/> {t('modal.table_generator', 'Tabellen Generator')}
+            <Grid3X3 size={20}/> {t('modal.table.title')}
           </h3>
           <button className="icon-btn" onClick={onClose}><X size={20} /></button>
         </div>
 
-        <div className="controls" style={{ display: 'flex', gap: '20px', marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px' }}>
+        <div className="controls" style={{ display: 'flex', gap: '15px', marginBottom: '15px', padding: '10px', background: '#f5f5f5', borderRadius: '8px', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Zeilen</label>
+            <label style={{ fontSize: '12px', fontWeight: 'bold' }}>{t('modal.table.rows')}</label>
             <input type="number" min="1" max="50" value={rows} onChange={(e) => setRows(parseInt(e.target.value) || 1)} style={{ width: '60px', padding: '5px' }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold' }}>Spalten</label>
+            <label style={{ fontSize: '12px', fontWeight: 'bold' }}>{t('modal.table.cols')}</label>
             <input type="number" min="1" max="20" value={cols} onChange={(e) => setCols(parseInt(e.target.value) || 1)} style={{ width: '60px', padding: '5px' }} />
           </div>
+          
+          <button 
+            onClick={handleSmartPaste}
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '5px', 
+              background: '#2563eb', color: 'white', border: 'none', 
+              padding: '6px 12px', borderRadius: '4px', cursor: 'pointer',
+              height: '32px', fontSize: '13px'
+            }}
+            title={t('modal.table.paste_btn')}
+          >
+            <Clipboard size={14} /> {t('modal.table.paste_btn')}
+          </button>
+          
           <div style={{ fontSize: '12px', color: '#666', alignSelf: 'center', marginLeft: 'auto' }}>
-            💡 Tipp: Copy & Paste aus Excel funktioniert!
+            {t('modal.table.tip')}
           </div>
         </div>
 
-        <div className="table-grid-container" style={{ overflowX: 'auto', maxHeight: '400px', border: '1px solid #ddd' }}>
+        <div className="table-grid-container" style={{ overflowX: 'auto', maxHeight: '500px', border: '1px solid #ddd' }}>
           <table style={{ borderCollapse: 'collapse', width: '100%' }}>
             <tbody>
               {data.map((row, rIndex) => (
@@ -115,15 +146,16 @@ const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
                         type="text" 
                         value={cell} 
                         onChange={(e) => handleCellChange(rIndex, cIndex, e.target.value)}
-                        onPaste={(e) => handlePaste(e, rIndex, cIndex)}
-                        placeholder={rIndex === 0 ? `Header ${cIndex+1}` : ''}
+                        onPaste={(e) => handlePasteEvent(e, rIndex, cIndex)}
+                        placeholder={rIndex === 0 ? `${t('modal.table.header')} ${cIndex+1}` : ''}
                         style={{ 
                           width: '100%', 
                           border: 'none', 
                           padding: '8px', 
                           fontWeight: rIndex === 0 ? 'bold' : 'normal',
-                          background: rIndex === 0 ? '#f0f8ff' : 'white',
-                          minWidth: '100px'
+                          background: rIndex === 0 ? '#e6f3ff' : 'white',
+                          borderBottom: rIndex === 0 ? '2px solid #b3d7ff' : 'none',
+                          minWidth: '120px'
                         }}
                       />
                     </td>
@@ -135,8 +167,8 @@ const TableGenerator = ({ isOpen, onClose, onConfirm }) => {
         </div>
 
         <div className="modal-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button className="modal-btn cancel" onClick={onClose}>{t('common.cancel', 'Abbrechen')}</button>
-          <button className="modal-btn confirm" onClick={generateMarkdown}>{t('common.insert', 'Tabelle einfügen')}</button>
+          <button className="modal-btn cancel" onClick={onClose}>{t('common.cancel')}</button>
+          <button className="modal-btn confirm" onClick={generateMarkdown}>{t('common.insert')}</button>
         </div>
 
       </div>

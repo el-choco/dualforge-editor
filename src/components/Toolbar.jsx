@@ -8,10 +8,9 @@ import {
   Underline, Superscript, Subscript, Eye, Code2, 
   CheckSquare, Hash, Workflow, Sigma, Wand2, Layout, LayoutGrid,
   AlertOctagon, ListTree, Keyboard, MonitorPlay, Search, Percent, Minus,
-  Languages
+  Languages, FileCode, ChevronDown
 } from 'lucide-react';
 import { snippets } from '../utils/snippets.js';
-import LanguageDropdown from './LanguageDropdown.jsx';
 
 const Toolbar = ({ 
   onInsert, onOpenPicker, onOpenColor, onOpenEmoji, 
@@ -21,11 +20,22 @@ const Toolbar = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [showMore, setShowMore] = useState(false);
+  const [showLangs, setShowLangs] = useState(false);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'de' ? 'en' : 'de';
     i18n.changeLanguage(newLang);
   };
+
+  const codeLanguages = [
+    { name: 'JS', val: 'javascript' },
+    { name: 'HTML', val: 'html' },
+    { name: 'CSS', val: 'css' },
+    { name: 'Py', val: 'python' },
+    { name: 'Java', val: 'java' },
+    { name: 'SQL', val: 'sql' },
+    { name: 'Bash', val: 'bash' }
+  ];
 
   return (
     <div className="toolbars-ui-root">
@@ -47,7 +57,21 @@ const Toolbar = ({
         <div className="ui-group">
           <button className="ui-btn" onClick={onOpenLink} title={t('toolbar.markdown.link')}><Link size={18} /></button>
           <button className="ui-btn" onClick={onOpenImage} title={t('toolbar.markdown.image')}><Image size={18} /></button>
-          <LanguageDropdown onSelect={onInsert} />
+          
+          <div className="dropdown-container">
+            <button className="ui-btn" onClick={() => setShowLangs(!showLangs)} title="Code Block">
+              <FileCode size={18} /> <ChevronDown size={10} style={{marginLeft:2}}/>
+            </button>
+            {showLangs && (
+              <div className="dropdown-menu" onMouseLeave={() => setShowLangs(false)}>
+                {codeLanguages.map(l => (
+                  <button key={l.val} className="dropdown-item" onClick={() => { onInsert(`\`\`\`${l.val}\n`, '\n\`\`\`'); setShowLangs(false); }}>
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           
           <div className="dropdown-container">
             <button className="ui-btn" onClick={() => setShowMore(!showMore)} title={t('toolbar.markdown.more')}><MoreHorizontal size={18} /></button>
@@ -112,15 +136,26 @@ const Toolbar = ({
         </div>
         <div className="ui-sep" />
         <div className="ui-group">
-          <button className="ui-btn" onClick={() => onInsert(snippets.details)} title={t('toolbar.html.spoiler')}><Eye size={18} /></button>
+          <button className="ui-btn" onClick={() => onInsert(
+            '<details style="border: 1px solid #aaa; border-radius: 4px; padding: .5em .5em 0;"><summary style="font-weight: bold; margin: -.5em -.5em 0; padding: .5em; cursor: pointer;">Details</summary><div style="padding: .5em;">',
+            '</div></details>'
+          )} title={t('toolbar.html.spoiler')}><Eye size={18} /></button>
           <button className="ui-btn" onClick={() => onInsert('<br>')} title={t('toolbar.html.br')}>&lt;br&gt;</button>
           <button className="ui-btn" onClick={onOpenPicker} title={t('toolbar.html.picker')}><Code2 size={18} /></button>
           <button className="ui-btn" onClick={() => onInsert(snippets.kbd)} title={t('toolbar.html.kbd')}><Keyboard size={18} /></button>
         </div>
         <div className="ui-sep" />
         <div className="ui-group">
-          <button className="ui-btn" onClick={() => onInsert(snippets.flexbox)} title={t('toolbar.html.flex')}><Layout size={18} /></button>
-          <button className="ui-btn" onClick={() => onInsert(snippets.grid)} title={t('toolbar.html.grid')}><LayoutGrid size={18} /></button>
+          <button className="ui-btn" onClick={() => onInsert(
+            '<div style="display: flex; gap: 15px; justify-content: center; align-items: center; border: 1px dashed #ccc; padding: 10px;">',
+            '</div>'
+          )} title={t('toolbar.html.flex')}><Layout size={18} /></button>
+          
+          <button className="ui-btn" onClick={() => onInsert(
+            '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border: 1px dashed #ccc; padding: 10px;">',
+            '</div>'
+          )} title={t('toolbar.html.grid')}><LayoutGrid size={18} /></button>
+          
           <button className="ui-btn" onClick={() => onInsert(snippets.progress)} title={t('toolbar.html.progress')}><Percent size={18} /></button>
           <button className="ui-btn" onClick={onOpenIframe} title={t('toolbar.html.iframe')}><MonitorPlay size={18} /></button>
           <button className="ui-btn" onClick={onToggleSearch} title={t('toolbar.html.search')}><Search size={18} /></button>

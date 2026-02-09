@@ -1,10 +1,11 @@
 {
   "common": {
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "insert": "Insert"
   },
   "editor": {
-    "title": "DualForge Editor  by el-choco",
+    "title": "DualForge Editor by el-choco",
     "placeholder": "Enter content here..."
   },
   "status": {
@@ -74,6 +75,14 @@
     "text": "Display Text / Alt Text",
     "url": "Target URL",
     "width": "Width",
-    "height": "Height"
+    "height": "Height",
+    "table": {
+      "title": "Table Generator",
+      "rows": "Rows",
+      "cols": "Columns",
+      "tip": "💡 Tip: Copy & Paste from Excel works!",
+      "paste_btn": "Paste from Clipboard",
+      "header": "Header"
+    }
   }
 }
